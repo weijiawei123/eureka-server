@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
     stages { 
@@ -8,13 +7,13 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'git-account', url: 'https://github.com/cweijiaweil-github/hellojib.git']]])
             }
         } 
-        stage('Build') {
+        stage('Package') {
             steps {
                 echo 'package'
                 bat "mvn -Dmaven.test.failure.ignore clean package" 
             }
         }
-        stage('Image') { 
+        stage('Build') { 
             steps { 
                 echo "Build To Docker!" 
                 bat 'docker build -t eureka:v1 .' 
