@@ -16,8 +16,6 @@ pipeline {
         }
         stage('Image') { 
             steps { 
-                echo "Delete Image!" 
-                bat 'docker build -t eureka:v1 .' 
                 echo "Build To Docker!" 
                 bat 'docker build -t eureka:v1 .' 
             } 
