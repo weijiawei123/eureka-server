@@ -1,28 +1,32 @@
-node {
 
-    withMaven(maven:'maven') {
-
+pipeline {
+    agent any
+    stages { 
         stage('Checkout') {
-            git url: 'https://github.com/cweijiaweil-github/emartback.git', credentialsId: 'github-piomin', branch: 'master'
-        }
-
+            steps {
+                echo 'pull git'
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'git-account', url: 'https://github.com/cweijiaweil-github/hellojib.git']]])
+            }
+        } 
         stage('Build') {
-            sh 'mvn clean install'
-
-            def pom = readMavenPom file:'pom.xml'
-            print pom.version
-            env.version = pom.version
+            steps {
+                echo 'package'
+                bat "mvn -Dmaven.test.failure.ignore clean package" 
+            }
         }
-
-        stage('Image') {
-            sh "docker build -t eureka:v1 ."
-        }
-
-        stage ('Run') {
-            sh "docker run -p 9001:9001 eureka"
-        }
-     
-
+        stage('Image') { 
+            steps { 
+                echo "Delete Image!" 
+                bat 'docker build -t eureka:v1 .' 
+                echo "Build To Docker!" 
+                bat 'docker build -t eureka:v1 .' 
+            } 
+        }    
+        stage('Run') { 
+            steps { 
+                echo "Run Docker Image" 
+                bat 'docker run -d -p 9100:9100 eureka:v1' 
+            } 
+        }     
     }
-
 }
